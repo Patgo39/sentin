@@ -1,0 +1,16 @@
+services:
+  postgres-db: 
+    image: postgres:16-alpine # Imagen postgres a usar, más segura
+    container_name: sentin-postgres # Nombre del contenedor
+    restart: always # Automaticamente se reinicia el contenedor si ocurre un error inesperado.
+    environment: # Definición de variables de entorno
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Si se apaga o borra el contenedor, los datos persisten
+
+volumes: # Declaración formal de todos los volumenes dentro del servicio
+  pgdata:
