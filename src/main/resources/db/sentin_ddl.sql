@@ -45,14 +45,33 @@ CREATE TABLE IF NOT EXISTS tag(
 
 CREATE UNIQUE INDEX uq_global_tags ON tag (tag_name) WHERE id_user IS NULL;
 
--- TAX CLASSIFICATION
+-- TAX CLASSIFCATIONS
 CREATE TABLE IF NOT EXISTS tax_classifications(
     id_classification BIGINT GENERATED ALWAYS AS IDENTITY,
-    name VARCHAR(70) NOT NULL,
+    sat_code CHAR(3) NOT NULL, 
+    name VARCHAR(100) NOT NULL,
     
     CONSTRAINT pk_class PRIMARY KEY (id_classification),
+    CONSTRAINT uq_sat_code UNIQUE (sat_code),
+    CONSTRAINT ck_valid_sat_code CHECK (sat_code ~ '^[0-9]{3}$'),
     CONSTRAINT ck_valid_tx_class_name CHECK (TRIM(name) <> '')
 );
+
+INSERT INTO tax_classifications (sat_code, name) VALUES
+    ('605', 'Sueldos y Salarios e Ingresos Asimilados a Salarios'),
+    ('606', 'Arrendamiento'),
+    ('607', 'Régimen de Enajenación o Adquisición de Bienes'),
+    ('608', 'Demás ingresos'),
+    ('610', 'Residentes en el Extranjero sin Establecimiento Permanente en México'),
+    ('611', 'Ingresos por Dividendos (socios y accionistas)'),
+    ('612', 'Personas Físicas con Actividades Empresariales y Profesionales'),
+    ('614', 'Ingresos por Intereses'),
+    ('615', 'Régimen de los ingresos por obtención de premios'),
+    ('616', 'Sin obligaciones fiscales'),
+    ('621', 'Incorporación Fiscal'),
+    ('625', 'Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas'),
+    ('626', 'Régimen Simplificado de Confianza')
+ON CONFLICT (sat_code) DO NOTHING;
 
 -- INCOME
 CREATE TABLE IF NOT EXISTS income (
@@ -69,7 +88,7 @@ CREATE TABLE IF NOT EXISTS income (
         REFERENCES sentin_user (id_user) ON DELETE CASCADE,
     CONSTRAINT fk_income_tag FOREIGN KEY (id_tag)
         REFERENCES tag (id_tag) ON DELETE SET NULL,
-    CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification),
+    CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification)
         REFERENCES tax_classifications (id_classification) ON DELETE SET NULL,
         
     CONSTRAINT ck_income_description CHECK (TRIM(description) <> ''),
