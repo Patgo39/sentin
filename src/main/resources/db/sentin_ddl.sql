@@ -1,6 +1,7 @@
--- drop schema public cascade;
--- create schema public;
+-- Drop schema public cascade;
+-- Create schema public;
 
+-- User
 CREATE TABLE IF NOT EXISTS sentin_user(
     id_user BIGINT GENERATED ALWAYS AS IDENTITY,
     given_name VARCHAR(20) NOT NULL,
@@ -22,74 +23,72 @@ CREATE TABLE IF NOT EXISTS sentin_user(
     CONSTRAINT ck_family_name_not_empty CHECK (TRIM(family_name) <> ''),
     CONSTRAINT ck_username_not_empty CHECK (TRIM(username) <> ''),
     CONSTRAINT ck_password_not_empty CHECK (TRIM("password") <> ''),
-    
     CONSTRAINT ck_rfc_longitud CHECK (TRIM(rfc) <> '' AND LENGTH(TRIM(rfc)) = 13),
-   
     CONSTRAINT ck_valid_date CHECK (birth_date <= CURRENT_DATE AND birth_date > '1900-01-01'),
-    
     CONSTRAINT ck_postal_code_formato CHECK (postal_code ~ '^[0-9]{5}$'),
     CONSTRAINT ck_phone_number_formato CHECK (phone_number ~ '^[0-9]{10}$'),
     CONSTRAINT ck_email_formato CHECK (email ~ '^[^@]+@[^@]+\.[^@]+$')
 );
 
--- Tag
+-- TAG
 CREATE TABLE IF NOT EXISTS tag(
-	id_tag bigint GENERATED ALWAYS AS IDENTITY,
-	id_user bigint NULL,
-	tag_name varchar(60) NOT NULL,
-	
-	CONSTRAINT pk_tag PRIMARY KEY (id_tag),
-	CONSTRAINT fk_user FOREIGN KEY (id_user)
-	   REFERENCES sentin_user (id_user) ON DELETE CASCADE,
-	CONSTRAINT uq_ids UNIQUE (id_tag, tag_name),
-	CONSTRAINT ck_valid_name CHECK (TRIM(tag_name) <> '')
+    id_tag BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_user BIGINT NULL,
+    tag_name VARCHAR(60) NOT NULL,
+    
+    CONSTRAINT pk_tag PRIMARY KEY (id_tag),
+    CONSTRAINT fk_user FOREIGN KEY (id_user)
+       REFERENCES sentin_user (id_user) ON DELETE CASCADE,
+    CONSTRAINT uq_user_tag_name UNIQUE (id_user, tag_name), 
+    CONSTRAINT ck_valid_name CHECK (TRIM(tag_name) <> '')
 );
+
 CREATE UNIQUE INDEX uq_global_tags ON tag (tag_name) WHERE id_user IS NULL;
 
--- Tax Classification
+-- TAX CLASSIFICATION
 CREATE TABLE IF NOT EXISTS tax_classifications(
-    id_classification bigint GENERATED ALWAYS AS IDENTITY,
-    name varchar(70) NOT NULL,
+    id_classification BIGINT GENERATED ALWAYS AS IDENTITY,
+    name VARCHAR(70) NOT NULL,
     
     CONSTRAINT pk_class PRIMARY KEY (id_classification),
-    CONSTRAINT ck_valid_tx_class_name CHECK (Trim(name) <> '')
+    CONSTRAINT ck_valid_tx_class_name CHECK (TRIM(name) <> '')
 );
 
-
--- Income
-CREATE TABLE IF NOT EXISTS income(
-	id_income bigint GENERATED ALWAYS AS IDENTITY,
-	id_tag bigint,
-	id_user bigint NOT NULL,
-	description TEXT NOT NULL,
-	amount numeric(10, 2) NOT NULL,
-	income_date date NOT NULL,
-	
-	CONSTRAINT pk_income PRIMARY KEY (id_income),
-	
-	CONSTRAINT fk_id_tag FOREIGN KEY (id_tag)
-		REFERENCES tag (id_tag) ON DELETE SET NULL,
-	CONSTRAINT fk_id_user FOREIGN KEY (id_user)
-		REFERENCES sentin_user (id_user) ON DELETE CASCADE,
-		
-	CONSTRAINT ck_amount CHECK (amount >= 0),
-	CONSTRAINT ck_date CHECK (income_date <= CURRENT_DATE),
-	CONSTRAINT ck_description CHECK (Trim(description) <> '')
+-- INCOME
+CREATE TABLE IF NOT EXISTS income (
+    id_income BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_user BIGINT NOT NULL,
+    id_tag BIGINT NULL,
+    id_classification BIGINT NULL,
+    description TEXT NOT NULL,
+    amount NUMERIC(10, 2) NOT NULL,
+    income_date DATE NOT NULL,
+    
+    CONSTRAINT pk_income PRIMARY KEY (id_income),
+    CONSTRAINT fk_income_user FOREIGN KEY (id_user)
+        REFERENCES sentin_user (id_user) ON DELETE CASCADE,
+    CONSTRAINT fk_income_tag FOREIGN KEY (id_tag)
+        REFERENCES tag (id_tag) ON DELETE SET NULL,
+    CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification),
+        REFERENCES tax_classifications (id_classification) ON DELETE SET NULL,
+        
+    CONSTRAINT ck_income_description CHECK (TRIM(description) <> ''),
+    CONSTRAINT ck_income_amount CHECK (amount > 0),
+    CONSTRAINT ck_income_date CHECK (income_date <= CURRENT_DATE)
 );
 
--- Credit Card
+-- CREDIT CARD
 CREATE TABLE IF NOT EXISTS credit_card (
     id_card BIGINT GENERATED ALWAYS AS IDENTITY,
     id_user BIGINT NOT NULL,
     card_alias VARCHAR(60) NOT NULL,
     bank VARCHAR(50) NOT NULL,
     last_four_digits CHAR(4) NULL,
-    interest_rate numeric(5, 2) NOT NULL, -- Tasa de Interés
-    cut_off_day SMALLINT NOT NULL, -- Día de corte
-    payment_due_day SMALLINT NOT NULL, -- Día de vencimiento del pago
-    credit_limit NUMERIC(10, 2) NOT NULL, -- Límite otorgado por el banco
-    user_credit_limit NUMERIC(10, 2), -- Límite establecido por el usuario
-    
+    interest_rate NUMERIC(5, 2) NOT NULL,
+    cut_off_day SMALLINT NOT NULL,
+    payment_due_day SMALLINT NOT NULL,
+    credit_limit NUMERIC(10, 2) NOT NULL,
+    user_credit_limit NUMERIC(10, 2) NULL,
 
     CONSTRAINT pk_credit_card PRIMARY KEY (id_card),
     CONSTRAINT fk_credit_card_user FOREIGN KEY (id_user)
@@ -99,47 +98,48 @@ CREATE TABLE IF NOT EXISTS credit_card (
     CONSTRAINT ck_card_alias_not_empty CHECK (TRIM(card_alias) <> ''),
     CONSTRAINT ck_bank_not_empty CHECK (TRIM(bank) <> ''),
     CONSTRAINT ck_credit_limit CHECK (credit_limit > 0),
-    CONSTRAINT ck_interest_rate CHECK (interest_rate > 0),
-    CONSTRAINT ck_user_credit_limit CHECK (user_credit_limit > 0),
+    CONSTRAINT ck_interest_rate CHECK (interest_rate >= 0), 
+    CONSTRAINT ck_user_credit_limit CHECK (user_credit_limit IS NULL OR (user_credit_limit > 0 AND user_credit_limit <= credit_limit)), 
     CONSTRAINT ck_cut_off_day CHECK (cut_off_day BETWEEN 1 AND 31),
     CONSTRAINT ck_payment_due_day CHECK (payment_due_day BETWEEN 1 AND 31),
     CONSTRAINT ck_last_four_digits CHECK (last_four_digits IS NULL OR last_four_digits ~ '^[0-9]{4}$')
 );
 
--- Expense
+-- EXPENSE
 CREATE TABLE IF NOT EXISTS expense (
     id_expense BIGINT GENERATED ALWAYS AS IDENTITY,
     id_user BIGINT NOT NULL,
     id_tag BIGINT NULL,
+    id_classification BIGINT NULL, 
     description TEXT NOT NULL,
     amount NUMERIC(10, 2) NOT NULL,
     expense_date DATE NOT NULL,
     is_debt BOOLEAN NOT NULL DEFAULT FALSE,
     
     CONSTRAINT pk_expense PRIMARY KEY (id_expense),
-    
     CONSTRAINT fk_expense_user FOREIGN KEY (id_user)
         REFERENCES sentin_user (id_user) ON DELETE CASCADE,
     CONSTRAINT fk_expense_tag FOREIGN KEY (id_tag)
         REFERENCES tag (id_tag) ON DELETE SET NULL,
+    CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification)
+        REFERENCES tax_classifications (id_classification) ON DELETE SET NULL,
         
     CONSTRAINT ck_expense_description CHECK (TRIM(description) <> ''),
     CONSTRAINT ck_expense_amount CHECK (amount > 0),
     CONSTRAINT ck_expense_date CHECK (expense_date <= CURRENT_DATE)
 );
 
--- Debt
+-- DEBT
 CREATE TABLE IF NOT EXISTS debt (
     id_expense BIGINT NOT NULL,
     id_card BIGINT NULL,
     limit_date DATE NULL,
-    -- 0 = Dinero propio / Préstamo personal, 1 = Tarjeta de Crédito
+    -- 0 = Own money, 1 = credit card
     debt_payment_type SMALLINT NOT NULL, 
-    interest_free SMALLINT NULL, -- Número de meses sin intereses (ej. 3, 6, 12)
+    interest_free SMALLINT NULL,
     payed BOOLEAN NOT NULL DEFAULT FALSE,
     
     CONSTRAINT pk_debt PRIMARY KEY (id_expense),
-    
     CONSTRAINT fk_debt_expense FOREIGN KEY (id_expense) 
         REFERENCES expense (id_expense) ON DELETE CASCADE,
     CONSTRAINT fk_debt_card FOREIGN KEY (id_card)
@@ -147,59 +147,17 @@ CREATE TABLE IF NOT EXISTS debt (
     
     CONSTRAINT ck_debt_type CHECK (debt_payment_type IN (0, 1)),
     
-    -- REGLA 1: Si es Dinero Propio (0) -> id_card es NULL. Si es Crédito (1) -> id_card es NOT NULL
     CONSTRAINT ck_valid_credit_state CHECK (
         (debt_payment_type = 0 AND id_card IS NULL) OR 
         (debt_payment_type = 1 AND id_card IS NOT NULL)
     ),
     
-    -- REGLA 2: Si es Crédito (1), OBLIGATORIAMENTE debe tener fecha límite de pago
     CONSTRAINT ck_limit_date CHECK (
         debt_payment_type = 0 OR limit_date IS NOT NULL
     ),
     
-    -- REGLA 3: Si es Dinero Propio (0) -> interest_free es NULL. Si es Crédito (1) -> interest_free es NOT NULL y >= 1
     CONSTRAINT ck_valid_interest_free CHECK (
         (debt_payment_type = 0 AND interest_free IS NULL) OR 
         (debt_payment_type = 1 AND interest_free IS NOT NULL AND interest_free >= 1)
     )
 );
-
--- income 
-CREATE TABLE IF NOT EXISTS income (
-    id_income BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_user BIGINT NOT NULL,
-    id_tag BIGINT NULL,
-    description TEXT NOT NULL,
-    amount NUMERIC(10, 2) NOT NULL,
-    income_date DATE NOT NULL,
-    
-    CONSTRAINT pk_income PRIMARY KEY (id_income),
-    
-    CONSTRAINT fk_income_user FOREIGN KEY (id_user)
-        REFERENCES sentin_user (id_user) ON DELETE CASCADE,
-    CONSTRAINT fk_income_tag FOREIGN KEY (id_tag)
-        REFERENCES tag (id_tag) ON DELETE SET NULL,
-        
-    CONSTRAINT ck_income_description CHECK (TRIM(description) <> ''),
-    CONSTRAINT ck_income_amount CHECK (amount > 0),
-    CONSTRAINT ck_income_date CHECK (income_date <= CURRENT_DATE)
-);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
