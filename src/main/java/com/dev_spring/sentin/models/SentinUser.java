@@ -23,7 +23,7 @@ public class SentinUser {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_user")
-  private Long idUser; // 💡 Tip: Usa el tipo envolvente 'Long' en lugar del primitivo 'long' para manejar estados transitorios (null antes de persistir).
+  private Long idUser;
   
   @Column(name = "given_name", nullable = false, length = 20)
   private String givenName;
