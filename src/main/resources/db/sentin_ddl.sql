@@ -43,6 +43,11 @@ CREATE TABLE IF NOT EXISTS tag(
     CONSTRAINT ck_valid_name CHECK (TRIM(tag_name) <> '')
 );
 
+INSERT INTO tag (tag_name) VALUES 
+	('Comida'),
+	('Transporte'),
+	('Vivienda');
+
 CREATE UNIQUE INDEX uq_global_tags ON tag (tag_name) WHERE id_user IS NULL;
 
 -- TAX CLASSIFCATIONS
