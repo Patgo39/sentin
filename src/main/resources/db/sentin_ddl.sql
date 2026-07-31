@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS tax_classifications(
     
     CONSTRAINT pk_class PRIMARY KEY (id_classification),
     CONSTRAINT uq_sat_code UNIQUE (sat_code),
-    CONSTRAINT ck_valid_sat_code CHECK (sat_code ~ '^[0-9]{3}$'),
+    CONSTRAINT ck_valid_sat_code CHECK (sat_code ~ '^[1-9][0-9]{2}$'),
     CONSTRAINT ck_valid_tx_class_name CHECK (TRIM(name) <> '')
 );
 
