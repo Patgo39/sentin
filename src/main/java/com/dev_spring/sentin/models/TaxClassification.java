@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "tax_classifications",
+@Table(name = "tax_classification",
     uniqueConstraints = @UniqueConstraint(
       name = "uq_sat_code",
       columnNames = "sat_code"
@@ -26,7 +26,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TexClassification {
+public class TaxClassification {
   
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

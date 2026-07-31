@@ -51,7 +51,7 @@ INSERT INTO tag (tag_name) VALUES
 CREATE UNIQUE INDEX uq_global_tags ON tag (tag_name) WHERE id_user IS NULL;
 
 -- TAX CLASSIFCATIONS
-CREATE TABLE IF NOT EXISTS tax_classifications(
+CREATE TABLE IF NOT EXISTS tax_classification(
     id_classification BIGINT GENERATED ALWAYS AS IDENTITY,
     sat_code CHAR(3) NOT NULL, 
     name VARCHAR(100) NOT NULL,
