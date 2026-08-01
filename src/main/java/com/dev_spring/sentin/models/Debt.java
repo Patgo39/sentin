@@ -36,6 +36,9 @@ public class Debt {
     @Column(name = "id_card")
     private Long idCard;
 
+    @Column(name = "debtor", nullable = false, length = 80)
+    private String debtor;
+
     @Column(name = "limit_date")
     private LocalDate limitDate;
 

@@ -1,5 +1,5 @@
--- Drop schema public cascade;
--- Create schema public;
+ -- Drop schema public cascade;
+ -- Create schema public;
 
 -- User
 CREATE TABLE IF NOT EXISTS sentin_user(
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS tax_classification(
     CONSTRAINT ck_valid_tx_class_name CHECK (TRIM(name) <> '')
 );
 
-INSERT INTO tax_classifications (sat_code, name) VALUES
+INSERT INTO tax_classification (sat_code, name) VALUES
     ('605', 'Sueldos y Salarios e Ingresos Asimilados a Salarios'),
     ('606', 'Arrendamiento'),
     ('607', 'Régimen de Enajenación o Adquisición de Bienes'),
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS income (
     CONSTRAINT fk_income_tag FOREIGN KEY (id_tag)
         REFERENCES tag (id_tag) ON DELETE SET NULL,
     CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification)
-        REFERENCES tax_classifications (id_classification) ON DELETE SET NULL,
+        REFERENCES tax_classification (id_classification) ON DELETE SET NULL,
         
     CONSTRAINT ck_income_description CHECK (TRIM(description) <> ''),
     CONSTRAINT ck_income_amount CHECK (amount > 0),
@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS expense (
     CONSTRAINT fk_expense_tag FOREIGN KEY (id_tag)
         REFERENCES tag (id_tag) ON DELETE SET NULL,
     CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification)
-        REFERENCES tax_classifications (id_classification) ON DELETE SET NULL,
+        REFERENCES tax_classification (id_classification) ON DELETE SET NULL,
         
     CONSTRAINT ck_expense_description CHECK (TRIM(description) <> ''),
     CONSTRAINT ck_expense_amount CHECK (amount > 0),
@@ -157,6 +157,7 @@ CREATE TABLE IF NOT EXISTS expense (
 CREATE TABLE IF NOT EXISTS debt (
     id_expense BIGINT NOT NULL,
     id_card BIGINT NULL,
+    debtor varchar(80) NOT NULL,
     limit_date DATE NULL,
     -- 0 = Own money, 1 = credit card
     debt_payment_type SMALLINT NOT NULL, 
@@ -170,6 +171,7 @@ CREATE TABLE IF NOT EXISTS debt (
         REFERENCES credit_card (id_card) ON DELETE SET NULL,
     
     CONSTRAINT ck_debt_type CHECK (debt_payment_type IN (0, 1)),
+    CONSTRAINT ck_debtor check(trim(debtor ) <> ''),
     
     CONSTRAINT ck_valid_credit_state CHECK (
         (debt_payment_type = 0 AND id_card IS NULL) OR 
