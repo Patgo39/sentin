@@ -7,8 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,8 +35,6 @@ public class Tag {
     @Column(name = "id_user")
     private Long idUser;
 
-    @NotBlank
-    @Size(max = 60)
     @Column(name = "tag_name", length = 60, nullable = false)
     private String tagName;
 }
