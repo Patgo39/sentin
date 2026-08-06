@@ -8,6 +8,7 @@ import org.mapstruct.MappingTarget;
 
 import com.dev_spring.sentin.dtos.ChangeEmailRequest;
 import com.dev_spring.sentin.dtos.CreateUserRequest;
+import com.dev_spring.sentin.dtos.UpdateUserProfileRequest;
 import com.dev_spring.sentin.dtos.UserResponse;
 import com.dev_spring.sentin.models.SentinUser;
 
@@ -25,4 +26,9 @@ public interface UserMapper {
   @Mapping(target = "email", source = "request.newEmail")
   void updateEmailFromRequest(ChangeEmailRequest request, @MappingTarget SentinUser entity);
 
+  @Mapping(target = "idUser", ignore = true)
+  @Mapping(target = "username", ignore = true)
+  @Mapping(target = "email", ignore = true)
+  @Mapping(target = "password", ignore = true)
+  void updateProfileFromRequest(UpdateUserProfileRequest request, @MappingTarget SentinUser entity);
 }

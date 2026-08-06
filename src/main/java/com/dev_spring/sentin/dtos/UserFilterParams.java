@@ -8,5 +8,6 @@ public record UserFilterParams(
     String familyName,
     String username,
     LocalDate birthDate,
-    String postalCode
+    String postalCode,
+    String rfc
 ) {}
