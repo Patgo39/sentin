@@ -27,7 +27,6 @@ public interface UserMapper {
   void updateEmailFromRequest(ChangeEmailRequest request, @MappingTarget SentinUser entity);
 
   @Mapping(target = "idUser", ignore = true)
-  @Mapping(target = "username", ignore = true)
   @Mapping(target = "email", ignore = true)
   @Mapping(target = "password", ignore = true)
   void updateProfileFromRequest(UpdateUserProfileRequest request, @MappingTarget SentinUser entity);
