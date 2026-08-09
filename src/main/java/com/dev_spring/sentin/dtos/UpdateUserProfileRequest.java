@@ -21,6 +21,10 @@ public record UpdateUserProfileRequest(
     @Size(max = 60, message = "Family name must not exceed 60 characters")
     String familyName,
 
+    @NotBlank(message = "Username is required")
+    @Size(max = 15, message = "username must not exceed 15 characters")
+    String username,
+
     @NotNull(message = "Birth date is required")
     @Past(message = "Birth date must be in the past")
     LocalDate birthDate,
