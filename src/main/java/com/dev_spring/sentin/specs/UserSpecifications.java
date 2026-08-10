@@ -55,7 +55,7 @@ public class UserSpecifications {
     /**
      * Combines all optional filters.
      */
-    public static Specification<SentinUser> withFilters(UserFilterParams filters) {
+    public static Specification<SentinUser> getQueryWithFilters(UserFilterParams filters) {
         if (filters == null) {
             return null;
         }
