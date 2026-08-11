@@ -1,5 +1,5 @@
- -- Drop schema public cascade;
- -- Create schema public;
+  Drop schema public cascade;
+  Create schema public;
 
 -- User
 CREATE TABLE IF NOT EXISTS sentin_user(
@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS tax_classification(
     CONSTRAINT ck_valid_tx_class_name CHECK (TRIM(name) <> '')
 );
 
+-- Full INSERT script for Physical Persons tax classifications (SAT c_RegimenFiscal)
 INSERT INTO tax_classification (sat_code, name) VALUES
     ('605', 'Sueldos y Salarios e Ingresos Asimilados a Salarios'),
     ('606', 'Arrendamiento'),
@@ -74,8 +75,11 @@ INSERT INTO tax_classification (sat_code, name) VALUES
     ('615', 'Régimen de los ingresos por obtención de premios'),
     ('616', 'Sin obligaciones fiscales'),
     ('621', 'Incorporación Fiscal'),
+    ('622', 'Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras'),
     ('625', 'Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas'),
-    ('626', 'Régimen Simplificado de Confianza')
+    ('626', 'Régimen Simplificado de Confianza'),
+    ('629', 'De los Regímenes Fiscales Preferentes y de las Empresas Multinacionales'),
+    ('630', 'Enajenación de acciones en bolsa de valores')
 ON CONFLICT (sat_code) DO NOTHING;
 
 -- INCOME
