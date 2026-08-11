@@ -1,5 +1,5 @@
-  Drop schema public cascade;
-  Create schema public;
+  -- Drop schema public cascade;
+  -- Create schema public;
 
 -- User
 CREATE TABLE IF NOT EXISTS sentin_user(

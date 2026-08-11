@@ -58,8 +58,33 @@ CREATE OR REPLACE TRIGGER trg_before_update_expense_is_debt
     EXECUTE FUNCTION check_expense_update_is_debt();
 
 
+CREATE OR REPLACE FUNCTION check_tax_classification_code()
+RETURNS TRIGGER
+AS $$
+DECLARE
+    tax_code CHAR(3);
+BEGIN
+    IF (NEW.id_classification IS NULL) THEN
+        RETURN NEW;
+    END IF;
 
+    SELECT sat_code INTO tax_code
+    FROM tax_classification
+    WHERE id_classification = NEW.id_classification;
 
+    IF (tax_code IN ('615', '616')) THEN
+        RAISE EXCEPTION 'Tax Classification code % is not valid for expenses', tax_code;
+    END IF;
+
+    RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_tax_classification_code
+    BEFORE INSERT OR UPDATE 
+    ON expense
+    FOR EACH ROW 
+    EXECUTE FUNCTION check_tax_classification_code();
 
 
 

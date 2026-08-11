@@ -39,7 +39,7 @@ public class Expense {
     private Tag tag;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_classification")
+    @JoinColumn(name = "id_classification", nullable = true)
     private TaxClassification classification;
 
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
