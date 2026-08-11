@@ -14,8 +14,8 @@ class TestcontainersConfiguration {
 	@Bean
 	@ServiceConnection
 	@ConditionalOnExpression("#{T(org.testcontainers.DockerClientFactory).instance().isDockerAvailable()}")
-	PostgreSQLContainer<?> postgresContainer() {
-		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
+	PostgreSQLContainer postgresContainer() {
+		return new PostgreSQLContainer(DockerImageName.parse("postgres:latest"));
 	}
 
 }
