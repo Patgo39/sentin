@@ -10,6 +10,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @Tag("integration")
 public abstract class AbstractPostgresIntegrationContainer {
 
+  @SuppressWarnings("resource")
   private static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:16-alpine")
       .withDatabaseName("sentin_test")
       .withUsername("sentin_user")
