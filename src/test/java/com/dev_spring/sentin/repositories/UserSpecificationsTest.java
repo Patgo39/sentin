@@ -14,7 +14,7 @@ import com.dev_spring.sentin.models.SentinUser;
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class UserSpecificationsTest {
+public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer {
 
   @Autowired
   private SentinUserRepository userRepository;
@@ -70,4 +70,6 @@ public class UserSpecificationsTest {
     // 3. Persistimos los datos en la base de datos PostgreSQL de Testcontainers
     userRepository.saveAll(List.of(user1, user2, user3));
   }
+
+
 }
