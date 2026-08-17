@@ -35,9 +35,32 @@ public class UserSpecifications {
                 : cb.like(cb.lower(root.get("username")), "%" + value.trim().toLowerCase() + "%");
     }
 
-    private static Specification<SentinUser> hasBirthDate(LocalDate value) {
-        return (root, query, cb) ->
-            value == null ? null : cb.equal(root.get("birthDate"), value);
+    private static Specification<SentinUser> hasMinAge(Integer minAge) {
+        return (root, query, cb) -> {
+        
+        if (minAge == null) {
+                return null;
+            }
+
+            LocalDate today = LocalDate.now();
+            LocalDate maxBirthDate = today.minusYears(minAge);
+
+            return cb.lessThanOrEqualTo(root.get("birthDate"), maxBirthDate);
+        };
+    }
+
+    private static Specification<SentinUser> hasMaxAge(Integer maxAge) {
+        return (root, query, cb) -> {
+        
+        if (maxAge == null) {
+                return null;
+            }
+
+            LocalDate today = LocalDate.now();
+            LocalDate maxBirthDate = today.minusYears(maxAge);
+
+            return cb.greaterThanOrEqualTo(root.get("birthDate"), maxBirthDate);
+        };
     }
 
     private static Specification<SentinUser> hasPostalCode(String value) {
@@ -60,12 +83,17 @@ public class UserSpecifications {
             return null;
         }
 
+        if(filters.minAge() != null && filters.maxAge() != null && filters.minAge() > filters.maxAge()) {
+            throw new IllegalArgumentException("minAge cannot be greater than maxAge");
+        }
+
         return Specification
             .where(givenNameContains(filters.givenName()))
             .and(middleNameContains(filters.middleName()))
             .and(familyNameContains(filters.familyName()))
             .and(usernameContains(filters.username()))
-            .and(hasBirthDate(filters.birthDate()))
+            .and(hasMinAge(filters.minAge()))
+            .and(hasMaxAge(filters.maxAge()))
             .and(hasPostalCode(filters.postalCode()))
             .and(hasRfc(filters.rfc()));
     }
