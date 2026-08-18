@@ -4,12 +4,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.data.jpa.domain.Specification;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.dev_spring.sentin.dtos.UserFilterParams;
 import com.dev_spring.sentin.models.SentinUser;
+import com.dev_spring.sentin.specs.UserSpecifications;
 
 @DataJpaTest
 @Testcontainers
@@ -71,5 +75,21 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
     userRepository.saveAll(List.of(user1, user2, user3));
   }
 
+  @Test
+  void testFindByFirstName(){
+    UserFilterParams filter = new UserFilterParams(
+      "Sofia",
+      null, 
+      null, 
+      null, 
+      null, 
+      null, 
+      null, 
+      null);
 
+      Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+      List<SentinUser> result = userRepository.findAll(spec);
+
+      assert result.size() == 1;
+  }
 }
