@@ -1,5 +1,5 @@
--- Drop schema public cascade;
--- Create schema public;
+  -- Drop schema public cascade;
+  -- Create schema public;
 
 -- User
 CREATE TABLE IF NOT EXISTS sentin_user(
@@ -43,21 +43,27 @@ CREATE TABLE IF NOT EXISTS tag(
     CONSTRAINT ck_valid_name CHECK (TRIM(tag_name) <> '')
 );
 
+INSERT INTO tag (tag_name) VALUES 
+	('Comida'),
+	('Transporte'),
+	('Vivienda');
+
 CREATE UNIQUE INDEX uq_global_tags ON tag (tag_name) WHERE id_user IS NULL;
 
 -- TAX CLASSIFCATIONS
-CREATE TABLE IF NOT EXISTS tax_classifications(
+CREATE TABLE IF NOT EXISTS tax_classification(
     id_classification BIGINT GENERATED ALWAYS AS IDENTITY,
     sat_code CHAR(3) NOT NULL, 
     name VARCHAR(100) NOT NULL,
     
     CONSTRAINT pk_class PRIMARY KEY (id_classification),
     CONSTRAINT uq_sat_code UNIQUE (sat_code),
-    CONSTRAINT ck_valid_sat_code CHECK (sat_code ~ '^[0-9]{3}$'),
+    CONSTRAINT ck_valid_sat_code CHECK (sat_code ~ '^[1-9][0-9]{2}$'),
     CONSTRAINT ck_valid_tx_class_name CHECK (TRIM(name) <> '')
 );
 
-INSERT INTO tax_classifications (sat_code, name) VALUES
+-- Full INSERT script for Physical Persons tax classifications (SAT c_RegimenFiscal)
+INSERT INTO tax_classification (sat_code, name) VALUES
     ('605', 'Sueldos y Salarios e Ingresos Asimilados a Salarios'),
     ('606', 'Arrendamiento'),
     ('607', 'Régimen de Enajenación o Adquisición de Bienes'),
@@ -69,8 +75,11 @@ INSERT INTO tax_classifications (sat_code, name) VALUES
     ('615', 'Régimen de los ingresos por obtención de premios'),
     ('616', 'Sin obligaciones fiscales'),
     ('621', 'Incorporación Fiscal'),
+    ('622', 'Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras'),
     ('625', 'Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas'),
-    ('626', 'Régimen Simplificado de Confianza')
+    ('626', 'Régimen Simplificado de Confianza'),
+    ('629', 'De los Regímenes Fiscales Preferentes y de las Empresas Multinacionales'),
+    ('630', 'Enajenación de acciones en bolsa de valores')
 ON CONFLICT (sat_code) DO NOTHING;
 
 -- INCOME
@@ -89,7 +98,7 @@ CREATE TABLE IF NOT EXISTS income (
     CONSTRAINT fk_income_tag FOREIGN KEY (id_tag)
         REFERENCES tag (id_tag) ON DELETE SET NULL,
     CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification)
-        REFERENCES tax_classifications (id_classification) ON DELETE SET NULL,
+        REFERENCES tax_classification (id_classification) ON DELETE SET NULL,
         
     CONSTRAINT ck_income_description CHECK (TRIM(description) <> ''),
     CONSTRAINT ck_income_amount CHECK (amount > 0),
@@ -141,7 +150,7 @@ CREATE TABLE IF NOT EXISTS expense (
     CONSTRAINT fk_expense_tag FOREIGN KEY (id_tag)
         REFERENCES tag (id_tag) ON DELETE SET NULL,
     CONSTRAINT fk_expense_tax_classification FOREIGN KEY (id_classification)
-        REFERENCES tax_classifications (id_classification) ON DELETE SET NULL,
+        REFERENCES tax_classification (id_classification) ON DELETE SET NULL,
         
     CONSTRAINT ck_expense_description CHECK (TRIM(description) <> ''),
     CONSTRAINT ck_expense_amount CHECK (amount > 0),
@@ -152,6 +161,7 @@ CREATE TABLE IF NOT EXISTS expense (
 CREATE TABLE IF NOT EXISTS debt (
     id_expense BIGINT NOT NULL,
     id_card BIGINT NULL,
+    debtor varchar(80) NOT NULL,
     limit_date DATE NULL,
     -- 0 = Own money, 1 = credit card
     debt_payment_type SMALLINT NOT NULL, 
@@ -165,6 +175,7 @@ CREATE TABLE IF NOT EXISTS debt (
         REFERENCES credit_card (id_card) ON DELETE SET NULL,
     
     CONSTRAINT ck_debt_type CHECK (debt_payment_type IN (0, 1)),
+    CONSTRAINT ck_debtor check(trim(debtor ) <> ''),
     
     CONSTRAINT ck_valid_credit_state CHECK (
         (debt_payment_type = 0 AND id_card IS NULL) OR 
@@ -180,3 +191,16 @@ CREATE TABLE IF NOT EXISTS debt (
         (debt_payment_type = 1 AND interest_free IS NOT NULL AND interest_free >= 1)
     )
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
