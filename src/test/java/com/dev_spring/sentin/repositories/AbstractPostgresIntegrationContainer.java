@@ -14,7 +14,8 @@ public abstract class AbstractPostgresIntegrationContainer {
   private static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:16-alpine")
       .withDatabaseName("sentin_test")
       .withUsername("sentin_user")
-      .withPassword("sentin_pass");
+      .withPassword("sentin_pass")
+      .withInitScript("db/sentin_ddl.sql");
 
   static {
     POSTGRES.start();

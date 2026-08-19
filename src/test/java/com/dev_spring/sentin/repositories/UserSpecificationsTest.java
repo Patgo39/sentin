@@ -1,5 +1,7 @@
 package com.dev_spring.sentin.repositories;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,10 +27,8 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
 
   @BeforeEach
   void setUp() {
-    // 1. Limpiamos registros previos
     userRepository.deleteAll();
 
-    // 2. Instanciamos los usuarios de prueba
     SentinUser user1 = new SentinUser(
         null,                      
         "Sofía",                
@@ -78,7 +78,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   @Test
   void testFindByFirstName(){
     UserFilterParams filter = new UserFilterParams(
-      "Sofia",
+      "vAleRiA",
       null, 
       null, 
       null, 
@@ -89,7 +89,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
 
       Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
       List<SentinUser> result = userRepository.findAll(spec);
-
-      assert result.size() == 1;
+      
+      assertTrue(result.size() == 1);
   }
 }
