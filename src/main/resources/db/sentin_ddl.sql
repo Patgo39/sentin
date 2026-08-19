@@ -191,3 +191,25 @@ CREATE TABLE IF NOT EXISTS debt (
         (debt_payment_type = 1 AND interest_free IS NOT NULL AND interest_free >= 1)
     )
 );
+
+
+SELECT current_database(), current_user, current_schema();
+SHOW search_path;
+
+select n.nspname as schema_name, c.relname, c.relkind
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where c.relname = 'orders'
+order by n.nspname;
+
+
+
+
+
+
+
+
+
+
+
+
