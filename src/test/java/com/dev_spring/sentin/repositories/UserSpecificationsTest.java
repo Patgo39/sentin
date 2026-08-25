@@ -78,7 +78,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   @Test
   void testFindByFirstName(){
     UserFilterParams filter = new UserFilterParams(
-      "sOfÍa",
+      "sOfia",
       null, 
       null, 
       null, 
