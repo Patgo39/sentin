@@ -79,7 +79,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por primer nombre (givenName)")
+  @DisplayName("Filter by given name (givenName)")
   void testFindByGivenName() {
     UserFilterParams filter = new UserFilterParams("sOfia", null, null, null, null, null, null, null);
 
@@ -91,7 +91,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por segundo nombre (middleName)")
+  @DisplayName("Filter by middle name (middleName)")
   void testFindByMiddleName() {
     UserFilterParams filter = new UserFilterParams(null, "elena", null, null, null, null, null, null);
 
@@ -103,7 +103,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por apellidos (familyName)")
+  @DisplayName("Filter by family name (familyName)")
   void testFindByFamilyName() {
     UserFilterParams filter = new UserFilterParams(null, null, "gomez", null, null, null, null, null);
 
@@ -115,7 +115,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por nombre de usuario (username)")
+  @DisplayName("Filter by username (username)")
   void testFindByUsername() {
     UserFilterParams filter = new UserFilterParams(null, null, null, "asilva", null, null, null, null);
 
@@ -127,7 +127,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por edad mínima (minAge)")
+  @DisplayName("Filter by minimum age (minAge)")
   void testFindByMinAge() {
     // Usuarios con al menos 30 años (Valeria: 31 años)
     UserFilterParams filter = new UserFilterParams(null, null, null, null, 30, null, null, null);
@@ -140,7 +140,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por edad máxima (maxAge)")
+  @DisplayName("Filter by maximum age (maxAge)")
   void testFindByMaxAge() {
     // Usuarios con 25 años o menos (Alejandro: 24 años)
     UserFilterParams filter = new UserFilterParams(null, null, null, null, null, 25, null, null);
@@ -153,7 +153,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por código postal (postalCode)")
+  @DisplayName("Filter by postal code (postalCode)")
   void testFindByPostalCode() {
     UserFilterParams filter = new UserFilterParams(null, null, null, null, null, null, "03100", null);
 
@@ -165,7 +165,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar por RFC")
+  @DisplayName("Filter by RFC")
   void testFindByRfc() {
     UserFilterParams filter = new UserFilterParams(null, null, null, null, null, null, null, "SITA011103AB4");
 
@@ -177,7 +177,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   }
 
   @Test
-  @DisplayName("Filtrar con parámetros nulos o vacíos debe retornar todos los registros")
+  @DisplayName("Filter when all parameters are null or empty should return all records")
   void testFindAllWhenFilterIsEmpty() {
     UserFilterParams filter = new UserFilterParams(null, "", "   ", null, null, null, null, null);
 
