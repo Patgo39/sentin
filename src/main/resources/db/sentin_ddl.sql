@@ -1,6 +1,8 @@
   -- Drop schema public cascade;
   -- Create schema public;
 
+  CREATE EXTENSION IF NOT EXISTS unaccent;
+   
 -- User
 CREATE TABLE IF NOT EXISTS sentin_user(
     id_user BIGINT GENERATED ALWAYS AS IDENTITY,

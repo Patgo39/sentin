@@ -78,7 +78,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   @Test
   void testFindByFirstName(){
     UserFilterParams filter = new UserFilterParams(
-      "vAleRiA",
+      "sOfÍa",
       null, 
       null, 
       null, 
@@ -90,6 +90,6 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
       Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
       List<SentinUser> result = userRepository.findAll(spec);
       
-      assertTrue(result.size() == 1);
+      assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
   }
 }
