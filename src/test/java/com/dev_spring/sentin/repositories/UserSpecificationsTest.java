@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -29,6 +30,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
   void setUp() {
     userRepository.deleteAll();
 
+    // Edad aprox a 2026: 28 años
     SentinUser user1 = new SentinUser(
         null,                      
         "Sofía",                
@@ -43,6 +45,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
         "RAMS9805141H9"              
     );
 
+    // Edad aprox a 2026: 24 años
     SentinUser user2 = new SentinUser(
         null,                            
         "Alejandro",           
@@ -57,6 +60,7 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
         "SITA011103AB4"                
     );
 
+    // Edad aprox a 2026: 31 años
     SentinUser user3 = new SentinUser(
         null,                          
         "Valeria",                     
@@ -71,25 +75,115 @@ public class UserSpecificationsTest extends AbstractPostgresIntegrationContainer
         "GOCV9508225T1"               
     );
 
-    // 3. Persistimos los datos en la base de datos PostgreSQL de Testcontainers
     userRepository.saveAll(List.of(user1, user2, user3));
   }
 
   @Test
-  void testFindByFirstName(){
-    UserFilterParams filter = new UserFilterParams(
-      "sOfia",
-      null, 
-      null, 
-      null, 
-      null, 
-      null, 
-      null, 
-      null);
+  @DisplayName("Filtrar por primer nombre (givenName)")
+  void testFindByGivenName() {
+    UserFilterParams filter = new UserFilterParams("sOfia", null, null, null, null, null, null, null);
 
-      Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
-      List<SentinUser> result = userRepository.findAll(spec);
-      
-      assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getUsername().equals("sramirez"), "Expected user 'sramirez'");
+  }
+
+  @Test
+  @DisplayName("Filtrar por segundo nombre (middleName)")
+  void testFindByMiddleName() {
+    UserFilterParams filter = new UserFilterParams(null, "elena", null, null, null, null, null, null);
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getGivenName().equals("Sofía"), "Expected givenName 'Sofía'");
+  }
+
+  @Test
+  @DisplayName("Filtrar por apellidos (familyName)")
+  void testFindByFamilyName() {
+    UserFilterParams filter = new UserFilterParams(null, null, "gomez", null, null, null, null, null);
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getUsername().equals("vgomez"), "Expected user 'vgomez'");
+  }
+
+  @Test
+  @DisplayName("Filtrar por nombre de usuario (username)")
+  void testFindByUsername() {
+    UserFilterParams filter = new UserFilterParams(null, null, null, "asilva", null, null, null, null);
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getGivenName().equals("Alejandro"), "Expected user 'Alejandro'");
+  }
+
+  @Test
+  @DisplayName("Filtrar por edad mínima (minAge)")
+  void testFindByMinAge() {
+    // Usuarios con al menos 30 años (Valeria: 31 años)
+    UserFilterParams filter = new UserFilterParams(null, null, null, null, 30, null, null, null);
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getUsername().equals("vgomez"), "Expected user 'vgomez'");
+  }
+
+  @Test
+  @DisplayName("Filtrar por edad máxima (maxAge)")
+  void testFindByMaxAge() {
+    // Usuarios con 25 años o menos (Alejandro: 24 años)
+    UserFilterParams filter = new UserFilterParams(null, null, null, null, null, 25, null, null);
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getUsername().equals("asilva"), "Expected user 'asilva'");
+  }
+
+  @Test
+  @DisplayName("Filtrar por código postal (postalCode)")
+  void testFindByPostalCode() {
+    UserFilterParams filter = new UserFilterParams(null, null, null, null, null, null, "03100", null);
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getUsername().equals("sramirez"), "Expected user 'sramirez'");
+  }
+
+  @Test
+  @DisplayName("Filtrar por RFC")
+  void testFindByRfc() {
+    UserFilterParams filter = new UserFilterParams(null, null, null, null, null, null, null, "SITA011103AB4");
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 1, "Expected 1 user, but found " + result.size());
+    assertTrue(result.get(0).getUsername().equals("asilva"), "Expected user 'asilva'");
+  }
+
+  @Test
+  @DisplayName("Filtrar con parámetros nulos o vacíos debe retornar todos los registros")
+  void testFindAllWhenFilterIsEmpty() {
+    UserFilterParams filter = new UserFilterParams(null, "", "   ", null, null, null, null, null);
+
+    Specification<SentinUser> spec = UserSpecifications.getQueryWithFilters(filter);
+    List<SentinUser> result = userRepository.findAll(spec);
+
+    assertTrue(result.size() == 3, "Expected 3 users, but found " + result.size());
   }
 }
